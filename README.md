@@ -1,5 +1,7 @@
 # Metaprogramming exercise
 
+## Task description
+
 The goals here is to implement a record structure that allows for an easy declarative programming structure. This is a toy exercise but utilizes techniques similar to projects like the Django ORM to allow for the behavior and structure of classes to be defined very declaratively. You must implement the Record class such that the fields are defined declaratively. The fields define a human readably label as well as a precondition which can check properties of a field on construction. The type of a field is defined by the attribute type annotation. An example is below:
 
 ```python
@@ -98,3 +100,10 @@ There are a bunch of concepts you will need to use:
 * `__str__`
 
 It is not expected that you will know all these language features, but you should be able to figure them out. There is a wealth of information online about how these work. If anything is unclear please contact me. The implementation should not take more than 100 lines. 
+
+## Testing
+
+```bash
+poetry install
+poetry run pytest -vvs
+```
