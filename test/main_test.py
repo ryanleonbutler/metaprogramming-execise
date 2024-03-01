@@ -2,6 +2,8 @@ import unittest
 from textwrap import dedent
 from unittest import TestCase
 
+from metaprogramming_exercise.main import Person
+
 
 # Tests
 class RecordTests(TestCase):

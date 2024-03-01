@@ -8,15 +8,31 @@ class Field:
     Defines a field with a label and preconditions
     """
 
-    label: str
-    precondition: Callable[[Any], bool] = None
+    def __init__(
+        self, label: str, precondition: Callable[[Any], bool] = lambda x: True
+    ):
+        self.label = label
+        self.precondition = precondition
 
 
 # Record and supporting classes here
+class RecordMeta(type):
+    def __new__(cls, name, bases, attrs):
+        fields = {}
+        for key, value in list(attrs.items()):
+            if isinstance(value, Field):
+                fields[key] = value
+        attrs["fields"] = fields
+        return super().__new__(cls, name, bases, attrs)
 
 
-class Record:
-    pass
+class Record(metaclass=RecordMeta):
+    def __init__(self, **kwargs):
+        for key, field in self.fields.items():
+            value = kwargs.get(key)
+            if not field.precondition(value):
+                raise TypeError(f"Invalid value for {field.label}")
+            setattr(self, key, value)
 
 
 # Usage of Record
