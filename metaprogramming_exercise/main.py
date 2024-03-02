@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from textwrap import dedent
 from typing import Any, Callable
 
 
@@ -27,14 +28,14 @@ class RecordMeta(type):
 
 
 class Record(metaclass=RecordMeta):
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         for key, field in self.__getattribute__("fields").items():
             value = kwargs.get(key)
             if not field.precondition(value):
                 raise TypeError(f"Invalid value for {field.label}")
             self.__setattr__(key, value, init=True)
 
-    def __setattr__(self, key, value, init=False):
+    def __setattr__(self, key, value, init=False) -> None:
         if not init:
             raise AttributeError(f"Cannot set {key} after construction")
         super().__setattr__(key, value)
@@ -49,6 +50,22 @@ class Person(Record):
     name: str = Field(label="The name")
     age: int = Field(label="The person's age", precondition=lambda x: 0 <= x <= 150)
     income: float = Field(label="The person's income", precondition=lambda x: 0 <= x)
+
+    def __str__(self) -> str:
+        return dedent(
+            f"""
+              {self.__class__.__name__}(
+              # The name
+              name='{self.name}'
+
+              # The person's age
+              age={self.age}
+
+              # The person's income
+              income={self.income}
+            )
+        """
+        ).strip()
 
 
 class Named(Record):
