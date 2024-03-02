@@ -1,10 +1,12 @@
 from dataclasses import dataclass
 from textwrap import dedent
-from typing import Any, Callable
+from typing import Any, Callable, Generic, TypeVar
+
+T = TypeVar("T")
 
 
 @dataclass
-class Field:
+class Field(Generic[T]):
     """
     Defines a field with a label and preconditions
     """
@@ -51,9 +53,13 @@ class Person(Record):
     A simple person record
     """
 
-    name: Field = Field(label="The name")
-    age: Field = Field(label="The person's age", precondition=lambda x: 0 <= x <= 150)
-    income: Field = Field(label="The person's income", precondition=lambda x: 0 <= x)
+    name: Field[str] = Field(label="The name")
+    age: Field[int] = Field(
+        label="The person's age", precondition=lambda x: 0 <= x <= 150
+    )
+    income: Field[float] = Field(
+        label="The person's income", precondition=lambda x: 0 <= x
+    )
 
     def __str__(self) -> str:
         return dedent(
@@ -77,7 +83,7 @@ class Named(Record):
     A base class for things with names
     """
 
-    name: str = Field(label="The name")
+    name: Field[str] = Field(label="The name")
 
 
 class Animal(Named):
@@ -85,11 +91,11 @@ class Animal(Named):
     An animal
     """
 
-    habitat: str = Field(
+    habitat: Field[str] = Field(
         label="The habitat",
         precondition=lambda x: x in ["air", "land", "water"],
     )
-    weight: float = Field(
+    weight: Field[float] = Field(
         label="The animals weight (kg)", precondition=lambda x: 0 <= x
     )
 
@@ -99,9 +105,9 @@ class Dog(Animal):
     A type of animal
     """
 
-    bark: str = Field(label="Sound of bark")
-    weight: float | int = Field(
+    bark: Field[str] = Field(label="Sound of bark")
+    weight: Field[float | int] = Field(
         label="The animals weight (kg)",
         precondition=lambda x: 0 <= x,
-        postcondition=lambda x: int(x),
+        postcondition=lambda x: isinstance(int(x), (float, int)),
     )
