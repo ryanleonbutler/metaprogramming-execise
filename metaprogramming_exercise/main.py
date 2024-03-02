@@ -10,10 +10,14 @@ class Field:
     """
 
     def __init__(
-        self, label: str, precondition: Callable[[Any], bool] = lambda x: True
+        self,
+        label: str,
+        precondition: Callable[[Any], bool] = lambda x: True,
+        postcondition: Callable[[Any], bool] = lambda x: True,
     ):
         self.label = label
         self.precondition = precondition
+        self.postcondition = postcondition
 
 
 # Record and supporting classes here
@@ -47,9 +51,9 @@ class Person(Record):
     A simple person record
     """
 
-    name: str = Field(label="The name")
-    age: int = Field(label="The person's age", precondition=lambda x: 0 <= x <= 150)
-    income: float = Field(label="The person's income", precondition=lambda x: 0 <= x)
+    name: Field = Field(label="The name")
+    age: Field = Field(label="The person's age", precondition=lambda x: 0 <= x <= 150)
+    income: Field = Field(label="The person's income", precondition=lambda x: 0 <= x)
 
     def __str__(self) -> str:
         return dedent(
@@ -96,3 +100,8 @@ class Dog(Animal):
     """
 
     bark: str = Field(label="Sound of bark")
+    weight: float | int = Field(
+        label="The animals weight (kg)",
+        precondition=lambda x: 0 <= x,
+        postcondition=lambda x: int(x),
+    )
