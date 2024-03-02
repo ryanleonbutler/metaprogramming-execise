@@ -28,11 +28,16 @@ class RecordMeta(type):
 
 class Record(metaclass=RecordMeta):
     def __init__(self, **kwargs):
-        for key, field in self.fields.items():
+        for key, field in self.__getattribute__("fields").items():
             value = kwargs.get(key)
             if not field.precondition(value):
                 raise TypeError(f"Invalid value for {field.label}")
-            setattr(self, key, value)
+            self.__setattr__(key, value, init=True)
+
+    def __setattr__(self, key, value, init=False):
+        if not init:
+            raise AttributeError(f"Cannot set {key} after construction")
+        super().__setattr__(key, value)
 
 
 # Usage of Record
