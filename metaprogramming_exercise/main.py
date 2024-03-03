@@ -7,8 +7,21 @@ T = TypeVar("T")
 
 @dataclass
 class Field(Generic[T]):
-    """
-    Defines a field with a label and preconditions
+    """Defines a generic field with a label and pre/post conditions.
+
+    Args:
+        label (str): The label for the field.
+        precondition (Callable[[Any], bool]): A callable that takes a value
+            and returns a bool indicating if the precondition is satisfied.
+            Defaults to a lambda that always returns True.
+        postcondition (Callable[[Any], bool]): A callable that takes a value
+            and returns a bool indicating if the postcondition is satisfied.
+            Defaults to a lambda that always returns True.
+
+    Attributes:
+        label (str): The label for the field.
+        precondition (Callable[[Any], bool]): The precondition callable.
+        postcondition (Callable[[Any], bool]): The postcondition callable.
     """
 
     def __init__(
@@ -22,8 +35,14 @@ class Field(Generic[T]):
         self.postcondition = postcondition
 
 
-# Record and supporting classes here
 class RecordMeta(type):
+    """Metaclass that extracts Field attributes to build the fields property.
+
+    Attributes:
+        fields (dict): Dict mapping field names to Field instances extracted
+            from Record subclass attributes. Added to subclass dict.
+    """
+
     def __new__(cls, name, bases, attrs):
         fields = {}
         for key, value in list(attrs.items()):
@@ -53,8 +72,19 @@ class Record(metaclass=RecordMeta):
 
 # Usage of Record
 class Person(Record):
-    """
-    A simple person record
+    """Base class for defining records with typed fields.
+
+    Records are immutable after construction. Fields are defined as
+    class attributes typed with Field subclasses.
+
+    Keyword Args:
+        Field values to initialize
+
+    Attributes:
+        fields (dict): Dict mapping field names to Field instances
+
+    Raises:
+        TypeError: If invalid field value that fails field precondition
     """
 
     name: Field[str] = Field(label="The name")
@@ -83,16 +113,23 @@ class Person(Record):
 
 
 class Named(Record):
-    """
-    A base class for things with names
+    """A base class for things with names.
+
+    Attributes:
+        name (str): The name of the object. This is specified as a required
+            Field with the label "The name".
     """
 
     name: Field[str] = Field(label="The name")
 
 
 class Animal(Named):
-    """
-    An animal
+    """An animal with a name, habitat, and weight.
+
+    Attributes:
+        name (str): The name of the animal
+        habitat (str): The habitat of the animal (air, land, water)
+        weight (float): The weight of the animal in kg (> 0)
     """
 
     habitat: Field[str] = Field(
@@ -105,8 +142,13 @@ class Animal(Named):
 
 
 class Dog(Animal):
-    """
-    A type of animal
+    """A dog with a name, habitat, weight, and bark sound.
+
+    Attributes:
+        name (str): The name of the dog
+        habitat (str): The habitat of the dog (air, land, water)
+        weight (float|int): The weight of the dog in kg (> 0)
+        bark (str): The sound of the dog's bark
     """
 
     bark: Field[str] = Field(label="Sound of bark")
