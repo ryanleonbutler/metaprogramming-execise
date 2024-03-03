@@ -41,6 +41,10 @@ class Record(metaclass=RecordMeta):
                 raise TypeError(f"Invalid value for {field.label}")
             self.__setattr__(key, value, init=True)
 
+    @property
+    def fields_list(self):
+        return list(self.__getattribute__("fields").keys())
+
     def __setattr__(self, key, value, init=False) -> None:
         if not init:
             raise AttributeError(f"Cannot set {key} after construction")
